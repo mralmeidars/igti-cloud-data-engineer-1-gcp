@@ -1,7 +1,5 @@
 import os
 import re
-#from google.auth import credentials
-#from google.auth.credentials import Credentials
 
 from pyspark.sql import SparkSession
 from google.oauth2 import service_account
@@ -12,7 +10,6 @@ from google.cloud.dataproc_v1.services.cluster_controller.transports.grpc import
 
 from google.cloud.dataproc_v1.services.job_controller.transports import JobControllerGrpcTransport
 from google.cloud.dataproc_v1.services.job_controller.client import JobControllerClient
-#from google.cloud.dataproc_v1.services.job_controller.transports.base import JobControllerTransport
 
 credentials = "../../iac/credentials_project.json"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../../iac/credentials_project.json"
@@ -45,8 +42,7 @@ def upload_data_to_gcs_bucket( bucket_path, origin_path, destination_path ):
             gcs_target.upload_from_filename(origin_path + filename)
 
 def get_dataproc_processing():
-    #gcp_credentials = service_account.Credentials.from_service_account_file(credentials_file)
-
+    print('** Starting Dataproc Cluster and Jobs')
     gdp_region_endpoint = '{}-dataproc.googleapis.com:443'.format(region)
     gdp_transport       = ClusterControllerGrpcTransport(host=gdp_region_endpoint)
     gdp_client          = dataproc_v1.ClusterControllerClient(transport=gdp_transport)
@@ -74,16 +70,12 @@ def get_dataproc_processing():
                                            region=region,
                                            job=job_details)
 
+    print('** Stoping Dataproc Cluster')
     gdp_client.stop_cluster()
 
 if __name__ == '__main__':
-    print('** Starting Upload FSiles')
+    print('** Starting Upload Files')
     upload_data_to_gcs_bucket( bucket_name, data_path, bronze_zone )
     upload_data_to_gcs_bucket( bucket_name, python_path, script_python_folder)
     upload_data_to_gcs_bucket( bucket_name, spark_path,  script_spark_folder)
-
-    print('** Starting Dataproc Cluster and Jobs')
     get_dataproc_processing()
-
-    print('** Stoping Dataproc Cluster')
-    stop_dataproc()
