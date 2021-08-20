@@ -1,11 +1,11 @@
 # IGTI Bootcamp - Cloud Data Engineer - Challenge 1
 
 <p align="center">
-    <a href="#motivation">Motivation</a> &bull;
-    <a href="#diagram">Motivation</a> &bull;
+    <a href="#description">Description</a> &bull;
+    <a href="#diagram">Diagram</a> &bull;
 </p>
 
-## Motivation
+## Description
 Create a process to start the infrastructure, ingest, read, transform (to Parquet file), processing and manipulate files on DataLake.
 The resources were created and destroyed by Terraform pipeline.
 
