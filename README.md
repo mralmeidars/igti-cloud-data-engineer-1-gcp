@@ -2,6 +2,7 @@
 
 <p align="center">
     <a href="#motivation">Motivation</a> &bull;
+    <a href="#diagram">Motivation</a> &bull;
 </p>
 
 ## Motivation
@@ -12,3 +13,6 @@ The resources were created and destroyed by Terraform pipeline.
 - Job Spark (PySpark) on GCP Cloud DataProc.
 - GCP BigQuery can be used to get insights querying the Data Lake (Parquet Files).
 
+## Diagram
+
+![diagram](https://github.com/mralmeidars/igti-cloud-data-engineer-1-gcp/blob/master/docs/Infrastructure_Diagram.png)
