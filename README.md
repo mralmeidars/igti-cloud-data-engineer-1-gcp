@@ -2,8 +2,8 @@
 
 <p align="center">
     <a href="#description">Description</a> &bull;
-    <a href="#diagram">Diagram</a> &bull;
     <a href="#stack">Stack</a> &bull;
+    <a href="#diagram">Diagram</a> &bull;
 </p>
 
 ## Description
