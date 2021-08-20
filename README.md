@@ -1,10 +1,8 @@
 # IGTI Bootcamp - Cloud Data Engineer - Challenge 1
 
--------
 <p align="center">
     <a href="#motivation">Motivation</a> &bull;
 </p>
--------
 
 ## Motivation
 Create a process to start the infrastructure, ingest, read, transform (to Parquet file), processing and manipulate files on DataLake.
