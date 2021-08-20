@@ -3,6 +3,7 @@
 <p align="center">
     <a href="#description">Description</a> &bull;
     <a href="#diagram">Diagram</a> &bull;
+    <a href="#stack">Stack</a> &bull;
 </p>
 
 ## Description
@@ -13,6 +14,11 @@ The resources were created and destroyed by Terraform pipeline.
 - Job Spark (PySpark) on GCP Cloud DataProc.
 - GCP BigQuery can be used to get insights querying the Data Lake (Parquet Files).
 
-## Diagram
+## Stack
+- Python
+- PySpark
+- Terraform
+- Google Cloud Platform (Cloud Storage, Cloud Dataproc)
 
+## Diagram
 ![diagram](https://github.com/mralmeidars/igti-cloud-data-engineer-1-gcp/blob/master/docs/Infrastructure_Diagram.png)
