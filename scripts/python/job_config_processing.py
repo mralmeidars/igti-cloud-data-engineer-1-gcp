@@ -1,58 +1,40 @@
-import os
-import re
+from os import environ, path, walk
+from json import load as json_load
 
 from pyspark.sql import SparkSession
+
 from google.oauth2 import service_account
 from google.cloud import dataproc_v1, storage
-
 from google.cloud.dataproc_v1.services.cluster_controller.client import ClusterControllerClient
 from google.cloud.dataproc_v1.services.cluster_controller.transports.grpc import ClusterControllerGrpcTransport
-
 from google.cloud.dataproc_v1.services.job_controller.transports import JobControllerGrpcTransport
 from google.cloud.dataproc_v1.services.job_controller.client import JobControllerClient
 
-credentials = "../../iac/credentials_project.json"
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../../iac/credentials_project.json"
 
-project_id   = "my-study-project-315901"
-region       = "southamerica-east1"
-cluster_name = "mrsa-cluster"
-
-data_path   = "../../data/"
-python_path = "../../scripts/python/"
-spark_path  = "../../scripts/spark/"
-
-script_python_folder = "scripts-python/"
-script_spark_folder  = "scripts-spark/"
-
-bucket_name = "mrsa-datalake"
-bronze_zone = "bronze-zone/"
-silver_zone = "silver-zone/"
-gold_zone   = "gold-zone/"
-
-def upload_data_to_gcs_bucket( bucket_path, origin_path, destination_path ):
+def upload_data_to_bucket( bucket_path, origin_path, destination_path ):
     gcs_client = storage.Client()
     gcs_bucket = gcs_client.get_bucket(bucket_path)
 
     # get files to uploading
-    for root, dirs, filenames in os.walk(origin_path):
+    for root, dirs, filenames in walk(origin_path):
         for f in filenames:
-            filename = os.path.relpath(os.path.join(root, f), origin_path)
+            filename = path.relpath(path.join(root, f), origin_path)
             gcs_target = gcs_bucket.blob(destination_path + filename)
             gcs_target.upload_from_filename(origin_path + filename)
 
-def get_dataproc_processing():
-    print('** Starting Dataproc Cluster and Jobs')
-    gdp_region_endpoint = '{}-dataproc.googleapis.com:443'.format(region)
-    gdp_transport       = ClusterControllerGrpcTransport(host=gdp_region_endpoint)
-    gdp_client          = dataproc_v1.ClusterControllerClient(transport=gdp_transport)
 
-    gdp_cluster = gdp_client.get_cluster( 
-                                    project_id=project_id,
-                                    region=region,
-                                    cluster_name=cluster_name)
+def get_dataproc_processing( bucket_name, project, region, cluster_name, spark_folder):
+    print('*** Starting Dataproc Cluster and Jobs ***')
+    gdp_region_endpoint  = '{}-dataproc.googleapis.com:443'.format(region)
+    gdp_transport_client = ClusterControllerGrpcTransport(host=gdp_region_endpoint)
+    gdp_cluster_client   = dataproc_v1.ClusterControllerClient(transport=gdp_transport_client)
 
-    job_spark_file      = "gs://" + bucket_name + "/" + script_spark_folder + "job_spark_processing.py"
+    gdp_cluster = gdp_cluster_client.get_cluster(
+                                            project_id=project,
+                                            region=region,
+                                            cluster_name=cluster_name)
+
+    job_spark_uri       = "gs://" + bucket_name + "/" + spark_folder + "job_spark_processing.py"
     job_transport       = JobControllerGrpcTransport(host=gdp_region_endpoint)
     job_dataproc_client = JobControllerClient(transport=job_transport)
 
@@ -61,21 +43,31 @@ def get_dataproc_processing():
             'cluster_name': cluster_name
         },
         'pyspark_job': {
-            'main_python_file_uri': job_spark_file
+            'main_python_file_uri': job_spark_uri
         }
     }
 
-    response = job_dataproc_client.submit_job(
-                                           project_id=project_id,
-                                           region=region,
-                                           job=job_details)
-
-    print('** Stoping Dataproc Cluster')
-    gdp_client.stop_cluster()
+    result = job_dataproc_client.submit_job(
+                                        project_id=project,
+                                        region=region,
+                                        job=job_details)
 
 if __name__ == '__main__':
-    print('** Starting Upload Files')
-    upload_data_to_gcs_bucket( bucket_name, data_path, bronze_zone )
-    upload_data_to_gcs_bucket( bucket_name, python_path, script_python_folder)
-    upload_data_to_gcs_bucket( bucket_name, spark_path,  script_spark_folder)
-    get_dataproc_processing()
+
+    # get parameters
+    with open('../../static/parameters.json') as pars:
+        params = json_load(pars)
+
+    environ["GOOGLE_APPLICATION_CREDENTIALS"] = params["CREDENTIALS"]
+
+    print('*** Starting Upload Files ***')
+    upload_data_to_bucket( bucket_path=params["BUCKET_NAME"], origin_path=params["DATA_PATH"], destination_path=params["BRONZE_ZONE"] )
+    upload_data_to_bucket( bucket_path=params["BUCKET_NAME"], origin_path=params["PYTHON_PATH"], destination_path=params["PYTHON_SCRIPT_FOLDER"] )
+    upload_data_to_bucket( bucket_path=params["BUCKET_NAME"], origin_path=params["SPARK_PATH"],  destination_path=params["SPARK_SCRIPT_FOLDER"] )
+
+    get_dataproc_processing( bucket_name=params["BUCKET_NAME"],
+                             project=params["PROJECT_ID"],
+                             region=params["REGION"],
+                             cluster_name=params["CLUSTER_NAME"],
+                             spark_folder=params["SPARK_SCRIPT_FOLDER"] )
+

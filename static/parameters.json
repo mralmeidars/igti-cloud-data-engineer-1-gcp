@@ -1,0 +1,19 @@
+{
+    "CREDENTIALS" : "../../static/credentials_project.json",
+    "PROJECT_ID" : "igti-projects-de",
+    "REGION" : "southamerica-east1",
+
+    "CLUSTER_NAME" : "mrsa-cluster",
+    "BUCKET_NAME" : "mrsa-datalake",
+
+    "BRONZE_ZONE" : "bronze-zone/",
+    "SILVER_ZONE" : "silver-zone/",
+    "GOLD_ZONE" : "gold-zone/",
+
+    "DATA_PATH" : "../../data/",
+    "PYTHON_PATH" : "../../scripts/python/",
+    "SPARK_PATH" : "../../scripts/spark/",
+
+    "PYTHON_SCRIPT_FOLDER" : "scripts-python/",
+    "SPARK_SCRIPT_FOLDER" : "scripts-spark/"    
+}

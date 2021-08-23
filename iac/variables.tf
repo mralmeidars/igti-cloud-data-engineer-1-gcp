@@ -1,6 +1,7 @@
 variable "project_id" {
     type        = string
     description = "Google Project ID"
+    default     = "igti-projects-de"
 }
 
 variable "region" {

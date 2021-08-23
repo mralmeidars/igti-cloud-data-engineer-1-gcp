@@ -1,5 +1,5 @@
 provider "google" {
-    credentials = "${file("credentials_project.json")}"
+    credentials = "${file("../static/credentials_project.json")}"
     project     = "${var.project_id}"
     region      = "${var.region}"
     zone        = "${var.zone}"
@@ -11,9 +11,9 @@ resource "google_dataproc_cluster" "mrsa_cluster" {
 }
 
 resource "google_storage_bucket" "mrsa_datalake_bucket" {
-    name          = "${var.bucket_name}"
     project	      = "${var.project_id}"
     location      = "${var.region}"
+    name          = "${var.bucket_name}"
     force_destroy = true
     storage_class = "STANDARD"
 }
